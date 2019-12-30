@@ -31,19 +31,31 @@
   unarchive: src="{{ webspheremq_internal.install_archive_path }}" dest="{{ webspheremq.unarchive_dir }}" copy=no
   become: yes
 
+#- name: Check on unarchived Install package output directory
+#  register: unarchived_output_dir: MQServer
+#  when: webspheremq.installation_version.major >= 8
+
+- name: Check on unarchived Install package output directory
+  set_fact:
+    unarchived_output_dir: MQServer
+  when: webspheremq.installation_version.major >= 8
+
+- debug:
+    var: unarchived_output_dir
+
 - name: Accept License
-  shell: chdir="{{ webspheremq.unarchive_dir }}" ./mqlicense.sh -accept
+  shell: chdir="{{ webspheremq.unarchive_dir }}/{{ unarchived_output_dir }}" ./mqlicense.sh -accept
   become: yes
 
 - name: Find rpms
-  shell: chdir="{{ webspheremq.unarchive_dir }}" ls {{ item }}
+  shell: chdir="{{ webspheremq.unarchive_dir }}/{{ unarchived_output_dir }}" ls {{ item }}
   with_items: "{{ webspheremq.rpm_fileglobs }}"
   register: rpms
   become: yes
 
 - name: Install rpm packages
   yum:
-    name: "{{ webspheremq.unarchive_dir }}/{{ item.stdout }}"
+    name: "{{ webspheremq.unarchive_dir }}/{{ unarchived_output_dir }}/{{ item.stdout }}"
     state: present
   with_items: "{{ rpms.results }}"
   become: yes

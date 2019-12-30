@@ -7,6 +7,10 @@ webspheremq:
   user: mqm
   group: mqm
   archive_dir: /mnt/nfs/ansible/websphere-mq/
+  installation_archive_file: "MQ_7.5.0.2_TRIAL_LNX_ON_X86_64_ML.tar.gz"
+  installation_version:
+    major: 7
+    minor: 5
   unarchive_dir: "/opt/temporary/{{ environment_name }}"
   rpm_fileglobs:
   - "MQSeriesRuntime-*.rpm"
@@ -39,7 +43,8 @@ webspheremq_log_directory: /var/mqm/GWPCDEV/log
 webspheremq_data_directory: /var/mqm/GWPCDEV/data
 
 webspheremq_internal:
-  install_archive_path: "{{ webspheremq.archive_dir }}/MQ_7.5.0.2_TRIAL_LNX_ON_X86_64_ML.tar.gz"
+  install_archive_path: "{{ webspheremq.archive_dir }}/{{ webspheremq.installation_archive_file }}"
+  unarchived_output_dir: ""
   required_directories:
   - /opt/mqm
   - /var/mqm
@@ -55,3 +60,7 @@ webspheremq_internal:
     type: "soft"
     item: "nofile"
     value: "10240"
+  - domain: "{{  webspheremq.user }}"
+    type: "-"
+    item: "nproc"
+    value: "4096"
